@@ -10,10 +10,10 @@
   "dependencies": {
     "backbone": "^1.4.0",
     "core-js": "^3.6.5",
-    "jointjs": "^3.4.3",
+    "jointjs": "^3.4.4",
     "jquerry": "0.0.1-security",
     "loadjs": "^4.2.0",
-    "vue": "^3.0.0"
+    "vue": "^3.2.20"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

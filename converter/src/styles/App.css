@@ -1,0 +1,47 @@
+.vueClass{
+    background: #1c2329;
+}
+table{
+    table-layout: inherit;
+    width: 100%;
+    height: 100%;
+}
+button:active
+{
+    background-color: #1c2329;
+    color: #909090;
+    border-bottom: 2px solid #fa8525;
+    border-right: 2px solid #fa8525;
+}
+button
+{
+    background-color: #1c2329;
+    color: #909090;
+    border-top: 2px solid #fa8525;
+    border-left: 2px solid #fa8525;
+}
+th{
+    font-weight: normal;
+    color: #909090;
+    border-bottom: 2px solid #fa8525;
+    padding: 10px 12px;
+    border-right: 2px solid #fa8525;
+}
+td{
+    color: #909090;
+    padding: 9px 12px;
+    transition: .3s linear;
+    border-right: 2px solid #fa8525;
+    border-bottom: 2px solid #fa8525;
+}
+.abstract{
+    color: #ffffff; 
+    font-family: ‘Lato’, sans-serif; 
+    font-size: 54px; 
+    font-weight: 300; 
+    line-height: 58px; 
+    margin: 0 0 58px;
+}
+body{
+    background-color: #1c2329;
+}

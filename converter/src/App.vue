@@ -104,6 +104,7 @@
                 <td>
                   <select v-model="relation1">
                   <option disabled value=""></option>
+                  <option>none</option>
                   <option>one</option>
                   <option>inherritence</option>
                   <option>aggregation</option>
@@ -115,7 +116,7 @@
                 <td>
                   <select v-model="relation2">
                   <option disabled value=""></option>
-                  <option>one</option>
+                  <option>none</option>
                   <option>inherritence</option>
                   <option>aggregation</option>
                   <option>one or many</option>
@@ -127,6 +128,50 @@
             </table>
             <button v-on:click="commitRelation">Commit</button>
 
+          </div>
+          <div v-if="deletingEntity==='yes'">
+           <button v-on:click="deleteEntity" >
+            Delete Entity
+          </button>
+          </div>
+          <div v-else>
+            <table>
+              <th>
+                Select entity
+              </th>
+              <tr>
+                <td>
+                  <select v-model="delEntity">
+                  <option v-for="table in tables" v-bind:key="table">
+                  {{table}}
+                  </option>
+                  </select>
+                </td>
+              </tr>
+            </table>
+            <button v-on:click="commitDelEntity">Commit</button>
+          </div>
+          <div v-if="deletingRelation==='yes'">
+           <button v-on:click="deleteRelation" >
+            Delete Relation
+          </button>
+          </div>
+          <div v-else>
+            <table>
+              <th>
+                Select Relation
+              </th>
+              <tr>
+                <td>
+                  <select v-model="delRelation">
+                  <option v-for="table in tables" v-bind:key="table">
+                  {{table}}
+                  </option>
+                  </select>
+                </td>
+              </tr>
+            </table>
+            <button v-on:click="commitDelRelation">Commit</button>
           </div>
         </td>
         <td>
@@ -159,6 +204,7 @@ export default {
   data:()=>
   (   
     {
+      delEntity:"",
       tables:[],
       entity1:"",
       entity2:"",
@@ -168,11 +214,19 @@ export default {
       eName:"sadasd",
       creatingEntity:"yes",
       creatingRelation:"yes",
+      deletingEntity:"yes",
+      deletingRelation:"yes",
       rows: [{id:1,name:"",type:"",iskey:"",nullable:""},]
     }
   ),
   methods:
   {
+    deleteRelation: function(){
+       this.deletingRelation="no"
+    },
+    deleteEntity: function(){
+      this.deletingEntity="no"
+    },
     createEntity: function()
     {
       this.creatingEntity="no"
@@ -182,10 +236,19 @@ export default {
       this.creatingRelation="no"
     }
     ,
+    commitDelRelation: function()
+    {
+       this.deletingRelation="yes"
+    },
     commitRelation: function()
     {
       this.erDiagramm.addRelation(this.entity1,this.entity2,this.relation1,this.relation2);
       this.creatingRelation="yes"
+    },
+    commitDelEntity: function()
+    {
+      this.erDiagramm.deleteEntity(this.delEntity)
+      this.deletingEntity="yes"
     },
     commitEntity: function()
     {

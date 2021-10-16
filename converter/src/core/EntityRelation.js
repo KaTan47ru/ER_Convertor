@@ -11,8 +11,9 @@ class EntityRelation{
             "one or many": 'M -10 -10 L -10 -30 M 0 -20 L -20 -20 M -20 -20 L -40 -10 M -20 -20 L -40 -20 M -20 -20 L -40 -30 z',
             "one or zero": 'M -10 -20 A -10 -10 360 1 1 -30 -20 M -10 -20 A -10 -10 360 1 0 -30 -20 M -30 -20 L -50 -10 M -30 -20 L -50 -20 M -30 -20 L -50 -30 z',
             "many or zero":'M -10 -20 A -10 -10 360 1 1 -30 -20 M -10 -20 A -10 -10 360 1 0 -30 -20 M -30 -20 L -50 -20 M -40 -10 L -40 -30 z',
-        }
-        
+            "none":''
+        };
+        this.relations=[];
         this.id = id;
         this.tables=[];
         this.elems=[]
@@ -154,17 +155,19 @@ class EntityRelation{
                 }
             }
         );
-        this.graph.addCell(tmp);
-        this.elems.push({name:entity.name,object:tmp})
-        console.log(tmp.id)
+        console.log(tmp.id);
         //Creating attributes for entity
-        for(var i in entity.attributes){
+        this.graph.addCell(tmp);
+        var attributesSet=[];
+        for(var i in entity.attributes)
+        {
             console.log(entity.attributes[i])
             if(entity.attributes[i].iskey)
             {
                 let tmpAttribute = this.addKeyAttribute(entity.attributes[i].name,entity.attributes[i].type);
                 this.graph.addCell(tmpAttribute);
                 this.addAttributeLink(tmp,tmpAttribute);
+                attributesSet.push(tmpAttribute);
             }
             else
             {
@@ -173,15 +176,19 @@ class EntityRelation{
                     let tmpAttribute = this.addCommonAttribute(entity.attributes[i].name,entity.attributes[i].type);
                     this.graph.addCell(tmpAttribute);
                     this.addAttributeLink(tmp,tmpAttribute);
+                    attributesSet.push(tmpAttribute);
                 }
                 else
                 {
                     let tmpAttribute = this.addNotNullAttribute(entity.attributes[i].name,entity.attributes[i].type);
                     this.graph.addCell(tmpAttribute);
                     this.addAttributeLink(tmp,tmpAttribute);
+                    attributesSet.push(tmpAttribute);
                 }
             }
         }
+        
+        this.elems.push({name:entity.name,object:tmp,attributes:attributesSet})
     }
    
     addRelation(entity1,entity2,label1,label2)
@@ -212,6 +219,7 @@ class EntityRelation{
     }
     addEntityLink(att1,att2,label1,label2)
     {
+        console.log(label1,label2)
         var myLink = new dia.Link({
            
             source: { id: att1.id },
@@ -301,7 +309,16 @@ class EntityRelation{
         return commonAttribute;
     }
 
-    
+    deleteEntity(entity)
+    {
+        var elem = this.elems.find(item=>item.name==entity);
+        if(elem==-1)
+            return 0;
+        console.log(elem)
+        this.graph.removeCells(elem.object)
+        this.graph.removeCells(elem.attributes)
+
+    }
     
     getTables(){
         let result=[];

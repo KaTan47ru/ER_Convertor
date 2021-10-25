@@ -114,7 +114,6 @@
                   <option>inherritence</option>
                   <option>aggregation</option>
                   <option>one or many</option>
-                  <option>one or zero</option>
                   <option>many or zero</option>
                   </select>
                 </td>
@@ -122,10 +121,10 @@
                   <select v-model="relation2">
                   <option disabled value=""></option>
                   <option>none</option>
+                  <option>one</option>
                   <option>inherritence</option>
                   <option>aggregation</option>
                   <option>one or many</option>
-                  <option>one or zero</option>
                   <option>many or zero</option>
                   </select>
                 </td>

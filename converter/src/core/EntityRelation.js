@@ -199,6 +199,14 @@ class EntityRelation{
             return 0;
         console.log(elem1.object,elem2.object)
         this.addEntityLink(elem1.object,elem2.object,label1,label2);
+        this.relations.push(
+            {
+                e1: this.tables.find(item=>item.name=entity1),
+                e2: this.tables.find(item=>item.name=entity2),
+                r1: label1,
+                r2: label2
+            }
+        )
         return 1;
 
         
@@ -219,6 +227,7 @@ class EntityRelation{
     }
     addEntityLink(att1,att2,label1,label2)
     {
+        
         console.log(label1,label2)
         var myLink = new dia.Link({
            
@@ -315,67 +324,44 @@ class EntityRelation{
         if(elem==-1)
             return 0;
         console.log(elem)
+        console.log("brfore")
+        console.log(this.elems.length)
         this.graph.removeCells(elem.object)
         this.graph.removeCells(elem.attributes)
+        this.elems.splice(this.elems.indexOf(elem),1)
 
     }
     
+    generateCode()
+    {
+        console.log(this.relations)
+        var result ="";
+        for( var i in this.tables)
+        {
+            result+="CEATE TABLE "+this.tables[i].name+"(\n";
+            console.log("elems")
+            console.log(this.tables[i].attributes)
+            for (var j in this.tables[i].attributes)
+            {
+                result+=this.tables[i].attributes[j].name+" "+this.tables[i].attributes[j].type+" "
+                if(this.tables[i].attributes[j].nullable==true)
+                    result+=",\n";
+                else
+                    result+="NOT NULL,\n";
+            }
+            result+=");\n";
+        }
+        return result;
+    }
+
     getTables(){
         let result=[];
-        for(var i in this.tables){
-            result.push(this.tables[i].name);
+        for(var i in this.elems){
+            result.push(this.elems[i].name);
         }
         return result;
     }
     
 
-    render()
-    {
-    /*var createLink = function(elm1, elm2) {
     
-        var myLink = new erd.Line({
-            markup: [
-                '<path class="connection" stroke="black" d="M 0 0 0 0"/>',
-                '<path class="connection-wrap" d="M 0 0 0 0"/>',
-                '<g class="labels"/>',
-                '<g class="marker-vertices"/>',
-                '<g class="marker-arrowheads"/>'
-            ].join(''),
-            source: { id: elm1.id },
-            target: { id: elm2.id }
-        });
-    
-        return myLink.addTo(graph);
-    };*/
-
-    /*var employee = new erd.Entity({
-
-        position: { x: 100, y: 200 },
-        attrs: {
-            text: {
-                fill: '#ffffff',
-                text: 'Employee',
-                letterSpacing: 0,
-                style: { textShadow: '1px 0 1px #333333' }
-            },
-            '.outer': {
-                fill: '#31d0c6',
-                stroke: 'none',
-                filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
-            },
-            '.inner': {
-                fill: '#31d0c6',
-                stroke: 'none',
-                filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
-            }
-        }
-    });
-    graph.addCells([employee])*/
-    
-    console.log(this.id,"rendered")
-    for( var i in this.tables)
-    console.log("entity+")
-        console.log(this.tables[i])
-        console.log("entity+")
-    }
 }

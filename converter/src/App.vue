@@ -44,7 +44,9 @@
                   <th>
                     Nullable
                   </th>
-
+                  <th>
+                    Foreign key
+                  </th>
                   <tr v-for="item in rows" v-bind:key="item.id">
                     <td>
                       <input type="text" v-model="item.name">
@@ -57,6 +59,9 @@
                     </td>
                     <td>
                       <input type="checkbox" v-model="item.nullable">
+                    </td>
+                    <td>
+                      <input type="checkbox" v-model="item.fk">
                     </td>
                   </tr>
                 </table>
@@ -151,28 +156,7 @@
             </table>
             <button v-on:click="commitDelEntity">Commit</button>
           </div>
-          <div v-if="deletingRelation==='yes'">
-           <button v-on:click="deleteRelation" >
-            Delete Relation
-          </button>
-          </div>
-          <div v-else>
-            <table>
-              <th>
-                Select Relation
-              </th>
-              <tr>
-                <td>
-                  <select v-model="delRelation">
-                  <option v-for="table in tables" v-bind:key="table">
-                  {{table}}
-                  </option>
-                  </select>
-                </td>
-              </tr>
-            </table>
-            <button v-on:click="commitDelRelation">Commit</button>
-          </div>
+          
         </td>
         <td>
           
@@ -181,10 +165,25 @@
           </div>
         </td>
         <td>
-          <label>{{createdCode}}</label>
-          <div id="myClass">
-
-          </div>
+          <table>
+            <tr>
+              <td>
+                <button v-on:click="generateCode" >
+                Generate SQL code
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p style="white-space: pre-line;">
+                  {{ createdCode }}
+                </p>
+              </td>
+            </tr>
+          </table>
+          
+          
+         
         </td>
       </tr>
     </table>
@@ -215,14 +214,14 @@ export default {
       creatingEntity:"yes",
       creatingRelation:"yes",
       deletingEntity:"yes",
-      deletingRelation:"yes",
-      rows: [{id:1,name:"",type:"",iskey:"",nullable:""},]
+      rows: [{id:1,name:"",type:"",iskey:"",nullable:"",fk:""},]
     }
   ),
   methods:
   {
-    deleteRelation: function(){
-       this.deletingRelation="no"
+    generateCode: function()
+    {
+      this.createdCode=this.erDiagramm.generateCode();
     },
     deleteEntity: function(){
       this.deletingEntity="no"
@@ -248,6 +247,7 @@ export default {
     commitDelEntity: function()
     {
       this.erDiagramm.deleteEntity(this.delEntity)
+      this.tables=this.erDiagramm.getTables()
       this.deletingEntity="yes"
     },
     commitEntity: function()
@@ -266,7 +266,8 @@ export default {
           name:this.rows[i].name,
           type:this.rows[i].type,
           iskey:this.rows[i].iskey,
-          nullable: this.rows[i].nullable
+          nullable: this.rows[i].nullable,
+          fk: this.rows[i].fk
         }
         tmp.attributes.push(row)
       }
@@ -285,43 +286,6 @@ export default {
     {
       this.rows.pop()
     },
-
-    render: function()
-    {
-        
-    
-  /*createLink(employee, paid).set(createLabel('1'));
-  createLink(employee, number);
-  createLink(employee, employeeName);
-  createLink(employee, skills);
-  createLink(employee, isa);
-  createLink(isa, salesman);
-  createLink(salesman, uses).set(createLabel('0..1'));
-  createLink(car, uses).set(createLabel('1..1'));
-  createLink(car, plate);
-  createLink(wage, paid).set(createLabel('N'));
-  createLink(wage, amount);
-  createLink(wage, date);
-  */this.convertSQL()
-console.log("created")
-    },
-  convertSQL: function()
-  {
-    var code=""
-    for(var i in this.tables)
-    {
-      console.log(this.tables[i])
-      code+="CREATE TABLE "+this.tables[i].name+" (\n"
-      for(var j in this.tables[i].attributes){
-        console.log(this.tables[i].attributes)
-        code+=this.tables[i][j][0].name
-        code+=this.tables[i][j].type
-        this.tables[i][j].iskey?code+=" PRIMARY KEY,\n":this.tables[i][j].nullable?code+=',\n':code+=" NOT NULL,\n";
-
-      }
-    }
-    this.createdCode=code
-  }
   },
   mounted(){
     this.erDiagramm= new EntityRelation("paper");

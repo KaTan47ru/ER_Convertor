@@ -135,21 +135,18 @@ class EntityRelation{
                 position: { x: 100, y: 200 },
                 attrs: {
                         text: {
-                            fill: '#ffffff',
+                            fill: '#909090',
                             text: entity.name,
                             letterSpacing: 0,
-                            style: { textShadow: '1px 0 1px #333333' }
                         },
                         '.outer': {
-                            fill: '#31d0c6',
-                            stroke: 'none',
-                            filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
-                        },
+                            fill: '#1C2329',
+                            stroke: '#FA8525',
+                             },
                         '.inner': {
-                            fill: '#31d0c6',
+                            fill: '#FA8525',
                             stroke: 'none',
-                            filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
-                        }
+                            }
                 }
             }
         );
@@ -250,18 +247,17 @@ class EntityRelation{
                 position: { x: 10, y: 90 },
                 attrs: {
                     text: {
-                        fill: '#ffffff',
-                        text: name+":"+type,
+                        fill: '#909090',
+                        text: "PK: "+name+":"+type,
                         letterSpacing: 0,
-                        style: { textShadow: '1px 0 1px #333333' }
                     },
                     '.outer': {
-                        fill: '#feb662',
-                        stroke: 'none',
-                        filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+                        fill: '#1C2329',
+                        stroke: '#FA8525',
+                        
                     },
                     '.inner': {
-                        fill: '#feb662',
+                        fill: '#FA8525',
                         stroke: 'none'
                     }
                 }
@@ -278,15 +274,18 @@ class EntityRelation{
                 position: { x: 75, y: 30 },
                 attrs: {
                     text: {
-                        fill: '#ffffff',
-                        text: name+":"+type,
+                        fill: '#909090',
+                        text: name+":"+type+" •",
                         letterSpacing: 0,
-                        style: { textShadow: '1px 0 1px #333333' }
                     },
                     '.outer': {
-                        fill: '#8000ff',
-                        stroke: '#8000ff',
-                        filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+                        fill: '#1C2329',
+                        stroke: '#FA8525',
+                        
+                    },
+                    '.inner': {
+                        fill: '#FA8525',
+                        stroke: 'none'
                     }
                 }
             }
@@ -301,15 +300,18 @@ class EntityRelation{
                 position: { x: 75, y: 30 },
                 attrs: {
                     text: {
-                        fill: '#ffffff',
-                        text: name+":"+type,
+                        fill: '#909090',
+                        text: name+":"+type+" о",
                         letterSpacing: 0,
-                        style: { textShadow: '1px 0 1px #333333' }
                     },
                     '.outer': {
-                        fill: '#fe8550',
-                        stroke: '#fe854f',
-                        filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+                        fill: '#1C2329',
+                        stroke: '#FA8525',
+                        
+                    },
+                    '.inner': {
+                        fill: '#FA8525',
+                        stroke: 'none'
                     }
                 }
             }

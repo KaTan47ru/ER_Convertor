@@ -390,176 +390,33 @@ class EntityRelation{
         let FKcode="";
         for(let i in this.relations)
         {
-            let usedR2FK=[]
-            let usedR1FK=[]
-            //inherritence
-            if(this.relations[i].r1=='inherritence')
+            //many-to-many
+            if(this.relations[i].r1 == "many or zero" ||
+               this.relations[i].r2 == "many or zero" )
             {
-                let r1PK=[];
-                let r2FK=[];
-                for(let j in this.relations[i].e1.attributes)
-                {
-                    if(this.relations[i].e1.attributes[j].iskey==true)
+                var PKGetter = entity =>{
+                    var res=[];
+                    console.log(entity);
+                    for(var j in entity.attributes)
                     {
-                        r1PK.push(this.relations[i].e1.attributes[j].name);
+                        console.log( entity.attributes[j]);
+                        if(entity.attributes[j].iskey==true)
+                        {
+                            res.push[
+                                {
+                                    name:entity.attributes[j].name,
+                                    type:entity.attributes[j].type,
+                                }
+                            ]
+                        }
                     }
-                    for(let k in this.relations[i].e2.attributes)
-                    {
-                        if( this.relations[i].e1.attributes[j].type==this.relations[i].e2.attributes[k].type
-                            && usedR2FK.find(item=>item==this.relations[i].e2.attributes[k].name==-1))
-                            {
-                                r2FK.push(this.relations[i].e2.attributes[k].name);
-                                usedR2FK.push(this.relations[i].e2.attributes[k].name)
-                            }
-                    }
+                    return res;
                 }
-
-                FKcode+="ALTER TABLE "+this.relations[i].r2.name+
-                        " ADD FOREIGN KEY ( "+r2FK.join(',')+") "+
-                        "REFERENCES "+this.relations[i].r1.name+
-                        " ("+r1PK.join(',')+") NOT NULL;\n";
-                continue;
+                var e1PK=PKGetter(this.relations[i].e1);
+                var e2PK=PKGetter(this.relations[i].e2);
+                console.log(e1PK);
+                console.log(e2PK);
             }
-            if(this.relations[i].r2=='inherritence')
-            {
-                let r2PK=[];
-                let r1FK=[];
-                for(let j in this.relations[i].e2.attributes)
-                {
-                    if(this.relations[i].e2.attributes[j].iskey==true)
-                    {
-                        r2PK.push(this.relations[i].e2.attributes[j].name);
-                    }
-                    for(let k in this.relations[i].e1.attributes)
-                    {
-                        if( this.relations[i].e2.attributes[j].type==this.relations[i].e1.attributes[k].type
-                            && usedR1FK.find(item=>item==this.relations[i].e1.attributes[k].name==-1))
-                            {
-                                r1FK.push(this.relations[i].e1.attributes[k].name);
-                                usedR1FK.push(this.relations[i].e1.attributes[k].name)
-                            }
-                    }
-                }
-
-                FKcode+="ALTER TABLE "+this.relations[i].r1.name+
-                        " ADD FOREIGN KEY ( "+r1FK.join(',')+") "+
-                        "REFERENCES "+this.relations[i].r2.name+
-                        " ("+r2PK.join(',')+") NOT NULL;\n";
-                continue;
-            }
-            //aggregation
-
-            //many*-many*
-            if((this.relations[i].r1=='many or zero'||this.relations[i].r1=='one or many')
-                &&(this.relations[i].r2=='many or zero'||this.relations[i].r2=='one or many'))
-            {
-                    console.log("ostanovilsya tut")
-            }
-            //many-or-zero-one
-            if(this.relations[i].r1=='many or zero')
-            {
-                let r1PK=[];
-                let r2FK=[];
-                for(let j in this.relations[i].e1.attributes)
-                {
-                    if(this.relations[i].e1.attributes[j].iskey==true)
-                    {
-                        r1PK.push(this.relations[i].e1.attributes[j].name);
-                    }
-                    for(let k in this.relations[i].e2.attributes)
-                    {
-                        if( this.relations[i].e1.attributes[j].type==this.relations[i].e2.attributes[k].type
-                            && usedR2FK.find(item=>item==this.relations[i].e2.attributes[k].name==-1))
-                            {
-                                r2FK.push(this.relations[i].e2.attributes[k].name);
-                                usedR2FK.push(this.relations[i].e2.attributes[k].name)
-                            }
-                    }
-                }
-                FKcode+="ALTER TABLE "+this.relations[i].r2.name+
-                        " ADD FOREIGN KEY ( "+r2FK.join(',')+") "+
-                        "REFERENCES "+this.relations[i].r1.name+
-                        " ("+r1PK.join(',')+");\n";
-            }
-            if(this.relations[i].r2=='many or zero')
-            {
-                let r2PK=[];
-                let r1FK=[];
-                for(let j in this.relations[i].e2.attributes)
-                {
-                    if(this.relations[i].e2.attributes[j].iskey==true)
-                    {
-                        r2PK.push(this.relations[i].e2.attributes[j].name);
-                    }
-                    for(let k in this.relations[i].e1.attributes)
-                    {
-                        if( this.relations[i].e2.attributes[j].type==this.relations[i].e1.attributes[k].type
-                            && usedR1FK.find(item=>item==this.relations[i].e1.attributes[k].name==-1))
-                            {
-                                r1FK.push(this.relations[i].e1.attributes[k].name);
-                                usedR1FK.push(this.relations[i].e1.attributes[k].name)
-                            }
-                    }
-                }
-
-                FKcode+="ALTER TABLE "+this.relations[i].r1.name+
-                        " ADD FOREIGN KEY ( "+r1FK.join(',')+") "+
-                        "REFERENCES "+this.relations[i].r2.name+
-                        " ("+r2PK.join(',')+");\n";
-            }
-            //many-one
-            if(this.relations[i].r1=='one or many')
-            {
-                let r1PK=[];
-                let r2FK=[];
-                for(let j in this.relations[i].e1.attributes)
-                {
-                    if(this.relations[i].e1.attributes[j].iskey==true)
-                    {
-                        r1PK.push(this.relations[i].e1.attributes[j].name);
-                    }
-                    for(let k in this.relations[i].e2.attributes)
-                    {
-                        if( this.relations[i].e1.attributes[j].type==this.relations[i].e2.attributes[k].type
-                            && usedR2FK.find(item=>item==this.relations[i].e2.attributes[k].name==-1))
-                            {
-                                r2FK.push(this.relations[i].e2.attributes[k].name);
-                                usedR2FK.push(this.relations[i].e2.attributes[k].name)
-                            }
-                    }
-                }
-                FKcode+="ALTER TABLE "+this.relations[i].r2.name+
-                        " ADD FOREIGN KEY ( "+r2FK.join(',')+") "+
-                        "REFERENCES "+this.relations[i].r1.name+
-                        " ("+r1PK.join(',')+") NOT NULL;\n";
-            }
-            if(this.relations[i].r2=='one or many')
-            {
-                let r2PK=[];
-                let r1FK=[];
-                for(let j in this.relations[i].e2.attributes)
-                {
-                    if(this.relations[i].e2.attributes[j].iskey==true)
-                    {
-                        r2PK.push(this.relations[i].e2.attributes[j].name);
-                    }
-                    for(let k in this.relations[i].e1.attributes)
-                    {
-                        if( this.relations[i].e2.attributes[j].type==this.relations[i].e1.attributes[k].type
-                            && usedR1FK.find(item=>item==this.relations[i].e1.attributes[k].name==-1))
-                            {
-                                r1FK.push(this.relations[i].e1.attributes[k].name);
-                                usedR1FK.push(this.relations[i].e1.attributes[k].name)
-                            }
-                    }
-                }
-
-                FKcode+="ALTER TABLE "+this.relations[i].r1.name+
-                        " ADD FOREIGN KEY ( "+r1FK.join(',')+") "+
-                        "REFERENCES "+this.relations[i].r2.name+
-                        " ("+r2PK.join(',')+") NOT NULL;\n";
-            }
-
             // {var elem = this.elems.find(item=>item.name==entity);
             //     e1: this.tables.find(item=>item.name==entity1),
             //     e2: this.tables.find(item=>item.name==entity2),

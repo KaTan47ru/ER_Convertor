@@ -39,13 +39,10 @@
                     Type
                   </th>
                   <th>
-                    Is key
+                    PK
                   </th>
                   <th>
-                    Nullable
-                  </th>
-                  <th>
-                    Foreign key
+                    NULL
                   </th>
                   <tr v-for="item in rows" v-bind:key="item.id">
                     <td>
@@ -59,9 +56,6 @@
                     </td>
                     <td>
                       <input type="checkbox" v-model="item.nullable">
-                    </td>
-                    <td>
-                      <input type="checkbox" v-model="item.fk">
                     </td>
                   </tr>
                 </table>
@@ -213,7 +207,7 @@ export default {
       creatingEntity:"yes",
       creatingRelation:"yes",
       deletingEntity:"yes",
-      rows: [{id:1,name:"",type:"",iskey:"",nullable:"",fk:""},]
+      rows: [{id:1,name:"",type:"",iskey:"",nullable:""},]
     }
   ),
   methods:

@@ -49,7 +49,16 @@
                       <input type="text" v-model="item.name">
                     </td>
                     <td>
-                      <input type="text" v-model="item.type">
+                      <select v-model="item.type">
+                        <option disabled value=""></option>
+                        <option>INT</option>
+                        <option>DATE</option>
+                        <option>VARCHAR</option>
+                      </select>
+                      <div v-if="item.type=='VARCHAR'">
+                          <input v-model="item.len" type="number">
+                          
+                      </div>
                     </td>
                     <td>
                       <input type="checkbox" v-model="item.iskey">
@@ -103,24 +112,47 @@
                 <td>
                   <select v-model="relation1">
                   <option disabled value=""></option>
-                  <option>none</option>
                   <option>one</option>
                   <option>inherritence</option>
                   <option>aggregation</option>
-                  <option>one or many</option>
                   <option>many or zero</option>
+                  <option>one or zero</option>
                   </select>
                 </td>
                 <td>
-                  <select v-model="relation2">
-                  <option disabled value=""></option>
-                  <option>none</option>
-                  <option>one</option>
-                  <option>inherritence</option>
-                  <option>aggregation</option>
-                  <option>one or many</option>
-                  <option>many or zero</option>
-                  </select>
+                  <div v-if="relation1=='aggregation'">
+                    <select v-model="relation2">
+                    <option disabled value=""></option>
+                    <option>one</option>
+                    </select>
+                  </div>
+                  <div v-if="relation1=='inherritence'">
+                    <select v-model="relation2">
+                    <option disabled value=""></option>
+                    <option>one or zero</option>
+                    </select>
+                  </div>
+                  <div v-if="relation1=='one or zero'">
+                    <select v-model="relation2">
+                    <option disabled value=""></option>
+                    <option>inherritence</option>
+                    </select>
+                  </div>
+                  <div v-if="relation1=='one'">
+                    <select v-model="relation2">
+                    <option disabled value=""></option>
+                    <option>many or zero</option>
+                    <option>aggregation</option>
+                    </select>
+                  </div>
+                  <div v-if="relation1=='many or zero'">
+                    <select v-model="relation2">
+                    <option disabled value=""></option>
+                    <option>many or zero</option>
+                    <option>one</option>
+                    </select>
+                  </div>
+                  
                 </td>
               </tr>
             </table>
@@ -254,13 +286,28 @@ export default {
       for(var i in this.rows)
       {
         console.log(this.rows[i])
-        var row =
+        var row ={};
+        if(this.rows[i].type=="VARCHAR")
         {
-          name:this.rows[i].name,
-          type:this.rows[i].type,
-          iskey:this.rows[i].iskey,
-          nullable: this.rows[i].nullable,
-          fk: this.rows[i].fk
+          row =
+          {
+            name:this.rows[i].name,
+            type:this.rows[i].type+"("+this.rows[i].len+")",
+            iskey:this.rows[i].iskey,
+            nullable: this.rows[i].nullable,
+            fk: this.rows[i].fk
+          }
+        }
+        else
+        {
+          row =
+          {
+            name:this.rows[i].name,
+            type:this.rows[i].type,
+            iskey:this.rows[i].iskey,
+            nullable: this.rows[i].nullable,
+            fk: this.rows[i].fk
+          }
         }
         tmp.attributes.push(row)
       }

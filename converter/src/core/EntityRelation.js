@@ -19,11 +19,10 @@ class EntityRelation{
         this.elems=[]
         this.erd = shapes.erd;
         this.graph = new dia.Graph();
-        console.log(id)
         this.paper = new dia.Paper({
             el: document.getElementById(id),
-            width: 695,
-            height: 600,
+            width: 1000,
+            height: 1000,
             model: this.graph,
             linkPinning: false,
             highlighting: false,
@@ -156,7 +155,6 @@ class EntityRelation{
         var attributesSet=[];
         for(var i in entity.attributes)
         {
-            console.log(entity.attributes[i])
             if(entity.attributes[i].iskey)
             {
                 let tmpAttribute = this.addKeyAttribute(entity.attributes[i].name,entity.attributes[i].type);
@@ -217,8 +215,6 @@ class EntityRelation{
             target: { id: att2.id },
             
         });
-        console.log("link")
-        console.log(myLink);
         
         return myLink.addTo(this.graph);
     }
@@ -332,18 +328,18 @@ class EntityRelation{
     
     generateCode()
     {
-        console.log(this.relations)
+        var normalizedTables=[]
         var result ="";
         result+="--Creating tables:\n";
         result+=this.createTablesCode();
-        result+="--Adding PK constraints:\n";
-        result+=this.createPKCode();
         result+="--Adding FK constraints:\n";
-        result+=this.createFKCode()
-        
+        result+=this.createFKCode(normalizedTables)
+        result+="--Adding PK constraints:\n";
+        result+=this.createPKCode(normalizedTables);
         return result;
     }
-    createTablesCode(){
+    createTablesCode()
+    {
         let tablesCode="";
         for( let i in this.tables)
         {
@@ -352,80 +348,256 @@ class EntityRelation{
             for (var j in this.tables[i].attributes)
             {
                 tablesCode+=this.tables[i].attributes[j].name+" "+this.tables[i].attributes[j].type+" "
-                if(this.tables[i].attributes[j].nullable==true)
-                    tablesCode+=",\n";
-                else
-                    tablesCode+="NOT NULL,\n";
+                if(this.tables[i].attributes[j].nullable!=true)
+                    tablesCode+="NOT NULL";
+                if(j<this.tables[i].attributes.length-1)
+                    tablesCode+=",\n"
+                else 
+                    tablesCode+="\n"
+                
             }
             tablesCode+=");\n";
         }
 
         return tablesCode;
     }
-    createPKCode()
+    createPKCode(normalizedTables)
     {
         let PKcode="";
-        for(let i in this.tables)
+        for(let i in normalizedTables)
         {
             var keyAttributes=[];
-            for(let j in this.tables[i].attributes)
+            for(let j in normalizedTables[i].attributes)
             {
-                if(this.tables[i].attributes[j].iskey==true)
+                if(normalizedTables[i].attributes[j].iskey==true)
                 {
-                    keyAttributes.push(this.tables[i].attributes[j].name);
+                    keyAttributes.push(normalizedTables[i].attributes[j].name);
                 }
             }
             if(keyAttributes.length!=0)
             {
                 PKcode+=
-                "ALTER TABLE "+this.tables[i].name+
-                " ADD CONSTRAINT PK_"+this.tables[i].name+
+                "ALTER TABLE "+normalizedTables[i].name+
+                " ADD CONSTRAINT PK_"+normalizedTables[i].name+
                 " PRIMARY KEY ("+keyAttributes.join(',')+");\n"
             }
         }
         return PKcode;
     }
-    createFKCode()
+    createFKCode(normalizedTables)
     {
         let FKcode="";
+        for(let i in this.tables)
+        {
+            normalizedTables.push({name:this.tables[i].name,attributes:Object.assign([],this.tables[i].attributes)});
+        }
+        
+        // aggregation
         for(let i in this.relations)
         {
-            //many-to-many
-            if(this.relations[i].r1 == "many or zero" ||
-               this.relations[i].r2 == "many or zero" )
+            if(this.relations[i].r1 == 'aggregation')
             {
-                var PKGetter = entity =>{
-                    var res=[];
-                    console.log(entity);
-                    for(var j in entity.attributes)
+                let elem_1 = normalizedTables.find(item=>item.name==this.relations[i].e1.name);
+                let elem_2 = normalizedTables.find(item=>item.name==this.relations[i].e2.name);
+                let keyParts=[];
+                let nativeKey=[];
+                for(let j in elem_2.attributes)
+                {
+                    if(elem_2.attributes[j].iskey==true)
                     {
-                        console.log( entity.attributes[j]);
-                        if(entity.attributes[j].iskey==true)
+                        keyParts.push(elem_2.attributes[j].name+elem_2.attributes[j].name)
+                        nativeKey.push(elem_2.attributes[j].name)
+                        elem_1.attributes.push(elem_2.attributes[j])
+                        FKcode+=
+                        "ALTER TABLE "+ this.relations[i].e1.name +
+                        " ADD " +elem_2.attributes[j].name+elem_2.attributes[j].name
+                        +" "+ elem_2.attributes[j].type+" NOT NULL;\n";
+                    }
+                }
+                FKcode+=
+                "ALTER TABLE "+elem_1.name+
+                " ADD FOREIGN KEY ("+keyParts.join(',')+
+                ") REFERENCES "+this.relations[i].e2.name+"("+nativeKey.join(',')+");\n"
+            }
+            if(this.relations[i].r2 == 'aggregation')
+            {
+                let elem_2 = normalizedTables.find(item=>item.name==this.relations[i].e2.name);
+                let elem_1 = normalizedTables.find(item=>item.name==this.relations[i].e1.name);
+                let keyParts=[];
+                let nativeKey=[];
+                for(let j in elem_1.attributes)
+                {
+                    if(elem_1.attributes[j].iskey==true)
+                    {
+                        keyParts.push(elem_1.attributes[j].name+elem_1.attributes[j].name)
+                        nativeKey.push(elem_1.attributes[j].name)
+                        elem_2.attributes.push(elem_1.attributes[j])
+                        FKcode+=
+                        "ALTER TABLE "+ this.relations[i].e2.name +
+                        " ADD " +elem_1.attributes[j].name+elem_1.attributes[j].name
+                        +" "+ elem_1.attributes[j].type+" NOT NULL;\n";
+                    }
+                }
+                FKcode+=
+                "ALTER TABLE "+elem_2.name+
+                " ADD FOREIGN KEY ("+keyParts.join(',')+
+                ") REFERENCES "+this.relations[i].e1.name+"("+nativeKey.join(',')+");\n"
+            }
+        }
+        // inherritence
+        for(let i in this.relations)
+        {
+            if(this.relations[i].r1 == 'inherritence')
+            {
+                let elem_2 = normalizedTables.find(item=>item.name==this.relations[i].e2.name);
+                let elem_1 = normalizedTables.find(item=>item.name==this.relations[i].e1.name);
+                let keyParts=[];
+                let nativeKey=[];
+                for(let j in elem_1.attributes)
+                {
+                    if(elem_1.attributes[j].iskey==true)
+                    {
+                        keyParts.push(elem_1.attributes[j].name+elem_1.attributes[j].name)
+                        nativeKey.push(elem_1.attributes[j].name)
+                        elem_2.attributes.push(elem_1.attributes[j])
+                        FKcode+=
+                        "ALTER TABLE "+ this.relations[i].e2.name +
+                        " ADD " +elem_1.attributes[j].name+elem_1.attributes[j].name
+                        +" "+ elem_1.attributes[j].type+" NOT NULL;\n";
+                    }
+                }
+                FKcode+=
+                "ALTER TABLE "+elem_2.name+
+                " ADD FOREIGN KEY ("+keyParts.join(',')+
+                ") REFERENCES "+this.relations[i].e1.name+"("+nativeKey.join(',')+");\n"
+            }
+            if(this.relations[i].r2 == 'inherritence')
+            {
+                let elem_1 = normalizedTables.find(item=>item.name==this.relations[i].e1.name);
+                let elem_2 = normalizedTables.find(item=>item.name==this.relations[i].e2.name);
+                let keyParts=[];
+                let nativeKey=[];
+                for(let j in elem_2.attributes)
+                {
+                    if(elem_2.attributes[j].iskey==true)
+                    {
+                        keyParts.push(elem_2.attributes[j].name+elem_2.attributes[j].name)
+                        nativeKey.push(elem_2.attributes[j].name)
+                        elem_1.attributes.push(elem_2.attributes[j])
+                        FKcode+=
+                        "ALTER TABLE "+ this.relations[i].e1.name +
+                        " ADD " +elem_2.attributes[j].name+elem_2.attributes[j].name
+                        +" "+ elem_2.attributes[j].type+" NOT NULL;\n";
+                    }
+                }
+                FKcode+=
+                "ALTER TABLE "+elem_1.name+
+                " ADD FOREIGN KEY ("+keyParts.join(',')+
+                ") REFERENCES "+this.relations[i].e2.name+"("+nativeKey.join(',')+");\n"
+            }
+        }
+        // many
+        for(let i in this.relations)
+        {
+            if(this.relations[i].r1 == 'many or zero'||this.relations[i].r2 == 'many or zero')
+            {   
+                // 1 - M
+                if(this.relations[i].r1 == 'one')
+                {
+                    let elem_2 = normalizedTables.find(item=>item.name==this.relations[i].e2.name);
+                    let elem_1 = normalizedTables.find(item=>item.name==this.relations[i].e1.name);
+                    let keyParts=[];
+                    let nativeKey=[];
+                    for(let j in elem_1.attributes)
+                    {
+                        if(elem_1.attributes[j].iskey==true)
                         {
-                            res.push[
-                                {
-                                    name:entity.attributes[j].name,
-                                    type:entity.attributes[j].type,
-                                }
-                            ]
+                            keyParts.push(elem_1.attributes[j].name+elem_1.attributes[j].name)
+                            nativeKey.push(elem_1.attributes[j].name)
+                            FKcode+=
+                            "ALTER TABLE "+ this.relations[i].e2.name +
+                            " ADD " +elem_1.attributes[j].name+elem_1.attributes[j].name
+                            +" "+ elem_1.attributes[j].type+" NOT NULL;\n";
                         }
                     }
-                    return res;
+                    FKcode+=
+                    "ALTER TABLE "+elem_2.name+
+                    " ADD FOREIGN KEY ("+keyParts.join(',')+
+                    ") REFERENCES "+this.relations[i].e1.name+"("+nativeKey.join(',')+");\n"
                 }
-                var e1PK=PKGetter(this.relations[i].e1);
-                var e2PK=PKGetter(this.relations[i].e2);
-                console.log(e1PK);
-                console.log(e2PK);
+                // M - 1
+                else if(this.relations[i].r2 == 'one')
+                {
+                    let elem_1 = normalizedTables.find(item=>item.name==this.relations[i].e1.name);
+                    let elem_2 = normalizedTables.find(item=>item.name==this.relations[i].e2.name);
+                    let keyParts=[];
+                    let nativeKey=[];
+                    for(let j in elem_2.attributes)
+                    {
+                        if(elem_2.attributes[j].iskey==true)
+                        {
+                            keyParts.push(elem_2.attributes[j].name+elem_2.attributes[j].name)
+                            nativeKey.push(elem_2.attributes[j].name)
+                            FKcode+=
+                            "ALTER TABLE "+ this.relations[i].e1.name +
+                            " ADD " +elem_2.attributes[j].name+elem_2.attributes[j].name
+                            +" "+ elem_2.attributes[j].type+" NOT NULL;\n";
+                        }
+                    }
+                    FKcode+=
+                    "ALTER TABLE "+elem_1.name+
+                    " ADD FOREIGN KEY ("+keyParts.join(',')+
+                    ") REFERENCES "+this.relations[i].e2.name+"("+nativeKey.join(',')+");\n"
+                }
+                // M -M
+                else
+                {
+                    let elem_2 = normalizedTables.find(item=>item.name==this.relations[i].e2.name);
+                    let elem_1 = normalizedTables.find(item=>item.name==this.relations[i].e1.name);
+                    FKcode+="CREATE TABLE "+elem_1.name+elem_2.name
+                    +"(\n);\n";
+                    let key1Parts=[];
+                    let key2Parts=[];
+                    let newAttibutes=[];
+                    for(let j in elem_1.attributes)
+                    {
+                        if(elem_1.attributes[j].iskey==true)
+                        {
+                            key1Parts.push(elem_1.attributes[j].name)
+                            newAttibutes.push(elem_1.attributes[j])
+                            FKcode+=
+                            "ALTER TABLE "+ elem_1.name+elem_2.name +
+                            " ADD " +elem_1.attributes[j].name
+                            +" "+ elem_1.attributes[j].type+" NOT NULL;\n";
+                        }
+                    }
+                    for(let j in elem_2.attributes)
+                    {
+                        if(elem_2.attributes[j].iskey==true)
+                        {
+                            key2Parts.push(elem_2.attributes[j].name)
+                            newAttibutes.push(elem_2.attributes[j])
+                            FKcode+=
+                            "ALTER TABLE "+ elem_1.name+elem_2.name+
+                            " ADD " +elem_2.attributes[j].name
+                            +" "+ elem_2.attributes[j].type+" NOT NULL;\n";
+                        }
+                    }
+                    FKcode+=
+                    "ALTER TABLE "+elem_1.name+elem_2.name+
+                    " ADD FOREIGN KEY ("+key1Parts.join(',')+
+                    ") REFERENCES "+this.relations[i].e1.name+"("+key1Parts.join(',')+");\n"
+                    FKcode+=
+                    "ALTER TABLE "+elem_1.name+elem_2.name+
+                    " ADD FOREIGN KEY ("+key2Parts.join(',')+
+                    ") REFERENCES "+this.relations[i].e2.name+"("+key2Parts.join(',')+");\n"
+                    normalizedTables.push({name: elem_1.name+elem_2.name,attributes: newAttibutes})
+                }
             }
-            // {var elem = this.elems.find(item=>item.name==entity);
-            //     e1: this.tables.find(item=>item.name==entity1),
-            //     e2: this.tables.find(item=>item.name==entity2),
-            //     r1: label1,
-            //     r2: label2
-            //             // }
-            //             ALTER TABLE Orders
-            // ADD FOREIGN KEY (PersonID) REFERENCES Persons(PersonID);
+            
         }
+        
+       
         return FKcode;
     }
     getTables(){

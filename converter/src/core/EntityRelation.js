@@ -343,7 +343,7 @@ class EntityRelation{
         let tablesCode="";
         for( let i in this.tables)
         {
-            tablesCode+="CEATE TABLE "+this.tables[i].name+"(\n";
+            tablesCode+="CREATE TABLE "+this.tables[i].name+"(\n";
             
             for (var j in this.tables[i].attributes)
             {
@@ -405,15 +405,17 @@ class EntityRelation{
                 {
                     if(elem_2.attributes[j].iskey==true)
                     {
-                        keyParts.push(elem_2.attributes[j].name+elem_2.attributes[j].name)
+                        keyParts.push(elem_2.attributes[j].name)
                         nativeKey.push(elem_2.attributes[j].name)
                         elem_1.attributes.push(elem_2.attributes[j])
                         FKcode+=
                         "ALTER TABLE "+ this.relations[i].e1.name +
-                        " ADD " +elem_2.attributes[j].name+elem_2.attributes[j].name
+                        " ADD " +elem_2.attributes[j].name
                         +" "+ elem_2.attributes[j].type+" NOT NULL;\n";
                     }
                 }
+                FKcode+= 
+                "ALTER TABLE " +elem_2.name+ " ADD CONSTRAINT "+nativeKey.join('_')+"_constraint UNIQUE ("+nativeKey.join(',')+")\n;";
                 FKcode+=
                 "ALTER TABLE "+elem_1.name+
                 " ADD FOREIGN KEY ("+keyParts.join(',')+
@@ -429,15 +431,17 @@ class EntityRelation{
                 {
                     if(elem_1.attributes[j].iskey==true)
                     {
-                        keyParts.push(elem_1.attributes[j].name+elem_1.attributes[j].name)
+                        keyParts.push(elem_1.attributes[j].name)
                         nativeKey.push(elem_1.attributes[j].name)
                         elem_2.attributes.push(elem_1.attributes[j])
                         FKcode+=
                         "ALTER TABLE "+ this.relations[i].e2.name +
-                        " ADD " +elem_1.attributes[j].name+elem_1.attributes[j].name
+                        " ADD " +elem_1.attributes[j].name
                         +" "+ elem_1.attributes[j].type+" NOT NULL;\n";
                     }
                 }
+                FKcode+= 
+                "ALTER TABLE " +elem_1.name+ " ADD CONSTRAINT "+nativeKey.join('_')+"_constraint UNIQUE ("+nativeKey.join(',')+")\n;";
                 FKcode+=
                 "ALTER TABLE "+elem_2.name+
                 " ADD FOREIGN KEY ("+keyParts.join(',')+
@@ -457,15 +461,17 @@ class EntityRelation{
                 {
                     if(elem_1.attributes[j].iskey==true)
                     {
-                        keyParts.push(elem_1.attributes[j].name+elem_1.attributes[j].name)
+                        keyParts.push(elem_1.attributes[j].name)
                         nativeKey.push(elem_1.attributes[j].name)
                         elem_2.attributes.push(elem_1.attributes[j])
                         FKcode+=
                         "ALTER TABLE "+ this.relations[i].e2.name +
-                        " ADD " +elem_1.attributes[j].name+elem_1.attributes[j].name
+                        " ADD " +elem_1.attributes[j].name
                         +" "+ elem_1.attributes[j].type+" NOT NULL;\n";
                     }
                 }
+                FKcode+= 
+                "ALTER TABLE " +elem_1.name+ " ADD CONSTRAINT "+nativeKey.join('_')+"_constraint UNIQUE ("+nativeKey.join(',')+")\n;";
                 FKcode+=
                 "ALTER TABLE "+elem_2.name+
                 " ADD FOREIGN KEY ("+keyParts.join(',')+
@@ -481,15 +487,17 @@ class EntityRelation{
                 {
                     if(elem_2.attributes[j].iskey==true)
                     {
-                        keyParts.push(elem_2.attributes[j].name+elem_2.attributes[j].name)
+                        keyParts.push(elem_2.attributes[j].name)
                         nativeKey.push(elem_2.attributes[j].name)
                         elem_1.attributes.push(elem_2.attributes[j])
                         FKcode+=
                         "ALTER TABLE "+ this.relations[i].e1.name +
-                        " ADD " +elem_2.attributes[j].name+elem_2.attributes[j].name
+                        " ADD " +elem_2.attributes[j].name
                         +" "+ elem_2.attributes[j].type+" NOT NULL;\n";
                     }
                 }
+                FKcode+= 
+                "ALTER TABLE " +elem_2.name+ " ADD CONSTRAINT "+nativeKey.join('_')+"_constraint UNIQUE ("+nativeKey.join(',')+")\n;";
                 FKcode+=
                 "ALTER TABLE "+elem_1.name+
                 " ADD FOREIGN KEY ("+keyParts.join(',')+
@@ -512,14 +520,16 @@ class EntityRelation{
                     {
                         if(elem_1.attributes[j].iskey==true)
                         {
-                            keyParts.push(elem_1.attributes[j].name+elem_1.attributes[j].name)
+                            keyParts.push(elem_1.attributes[j].name)
                             nativeKey.push(elem_1.attributes[j].name)
                             FKcode+=
                             "ALTER TABLE "+ this.relations[i].e2.name +
-                            " ADD " +elem_1.attributes[j].name+elem_1.attributes[j].name
+                            " ADD " +elem_1.attributes[j].name
                             +" "+ elem_1.attributes[j].type+" NOT NULL;\n";
                         }
                     }
+                    FKcode+= 
+                    "ALTER TABLE " +elem_1.name+ " ADD CONSTRAINT "+nativeKey.join('_')+"_constraint UNIQUE ("+nativeKey.join(',')+")\n;";
                     FKcode+=
                     "ALTER TABLE "+elem_2.name+
                     " ADD FOREIGN KEY ("+keyParts.join(',')+
@@ -536,14 +546,16 @@ class EntityRelation{
                     {
                         if(elem_2.attributes[j].iskey==true)
                         {
-                            keyParts.push(elem_2.attributes[j].name+elem_2.attributes[j].name)
+                            keyParts.push(elem_2.attributes[j].name)
                             nativeKey.push(elem_2.attributes[j].name)
                             FKcode+=
                             "ALTER TABLE "+ this.relations[i].e1.name +
-                            " ADD " +elem_2.attributes[j].name+elem_2.attributes[j].name
+                            " ADD " +elem_2.attributes[j].name
                             +" "+ elem_2.attributes[j].type+" NOT NULL;\n";
                         }
                     }
+                    FKcode+= 
+                    "ALTER TABLE " +elem_2.name+ " ADD CONSTRAINT "+nativeKey.join('_')+"_constraint UNIQUE ("+nativeKey.join(',')+")\n;";
                     FKcode+=
                     "ALTER TABLE "+elem_1.name+
                     " ADD FOREIGN KEY ("+keyParts.join(',')+
@@ -555,9 +567,10 @@ class EntityRelation{
                     let elem_2 = normalizedTables.find(item=>item.name==this.relations[i].e2.name);
                     let elem_1 = normalizedTables.find(item=>item.name==this.relations[i].e1.name);
                     FKcode+="CREATE TABLE "+elem_1.name+elem_2.name
-                    +"(\n);\n";
+                    +"(\n";
                     let key1Parts=[];
                     let key2Parts=[];
+                    let additionalRows=[];
                     let newAttibutes=[];
                     for(let j in elem_1.attributes)
                     {
@@ -565,10 +578,9 @@ class EntityRelation{
                         {
                             key1Parts.push(elem_1.attributes[j].name)
                             newAttibutes.push(elem_1.attributes[j])
-                            FKcode+=
-                            "ALTER TABLE "+ elem_1.name+elem_2.name +
-                            " ADD " +elem_1.attributes[j].name
-                            +" "+ elem_1.attributes[j].type+" NOT NULL;\n";
+                            additionalRows.push(elem_1.attributes[j].name
+                                +" "+ elem_1.attributes[j].type+" NOT NULL\n")
+                            
                         }
                     }
                     for(let j in elem_2.attributes)
@@ -577,12 +589,16 @@ class EntityRelation{
                         {
                             key2Parts.push(elem_2.attributes[j].name)
                             newAttibutes.push(elem_2.attributes[j])
-                            FKcode+=
-                            "ALTER TABLE "+ elem_1.name+elem_2.name+
-                            " ADD " +elem_2.attributes[j].name
-                            +" "+ elem_2.attributes[j].type+" NOT NULL;\n";
+                            additionalRows.push(elem_2.attributes[j].name
+                                +" "+ elem_2.attributes[j].type+" NOT NULL\n")
+                            
                         }
                     }
+                    FKcode+=additionalRows.join(',')+");\n"
+                    FKcode+= 
+                    "ALTER TABLE " +elem_1.name+ " ADD CONSTRAINT "+key1Parts.join('_')+"_constraint UNIQUE ("+key1Parts.join(',')+")\n;";
+                    FKcode+= 
+                    "ALTER TABLE " +elem_2.name+ " ADD CONSTRAINT "+key2Parts.join('_')+"_constraint UNIQUE ("+key2Parts.join(',')+")\n;";
                     FKcode+=
                     "ALTER TABLE "+elem_1.name+elem_2.name+
                     " ADD FOREIGN KEY ("+key1Parts.join(',')+

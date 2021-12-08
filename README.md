@@ -19,5 +19,5 @@
 **Information**
 ####
 The application was developen by one person and there might be some bugs.
-You can help to improve this application by sending some advice using following e-mail:
+You can help to improve this application by sending some recommendations using following e-mail:
     secreten_agent@mail.ru
